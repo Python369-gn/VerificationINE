@@ -1,0 +1,153 @@
+import React, { useState } from 'react';
+
+const Connexion = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      setError('Veuillez remplir tous les champs.');
+      return;
+    }
+   
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Veuillez entrer un email valide.');
+      return;
+    }
+    setError('');
+    alert('Connexion réussie');
+  };
+
+  return (
+    <div style={{ maxWidth: '350px', margin: '30px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+      <h2>Connexion</h2>
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '10px' }}>
+          <label>Email :</label><br />
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            style={{ width: '100%', padding: '8px' }}
+          />
+        </div>
+        <div style={{ marginBottom: '10px' }}>
+          <label>Mot de passe :</label><br />
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            style={{ width: '100%', padding: '8px' }}
+          />
+        </div>
+        {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+        <button type="submit" style={{ width: '100%', padding: '10px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px' }}>
+          Se connecter
+        </button>
+      </form>
+    </div>
+  );
+};
+
+// Version avec react-hook-form
+import { useForm } from 'react-hook-form';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+
+// Composant avec react-hook-form
+export const ConnexionHookForm = () => {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+
+  const onSubmit = (data) => {
+    alert('Connexion réussie');
+  };
+
+  return (
+    <div style={{ maxWidth: '350px', margin: '30px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+      <h2>Connexion (react-hook-form)</h2>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div style={{ marginBottom: '10px' }}>
+          <label>Email :</label><br />
+          <input
+            type="email"
+            {...register('email', {
+              required: 'Email requis',
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: 'Email invalide'
+              }
+            })}
+            style={{ width: '100%', padding: '8px' }}
+          />
+          {errors.email && <div style={{ color: 'red' }}>{errors.email.message}</div>}
+        </div>
+        <div style={{ marginBottom: '10px' }}>
+          <label>Mot de passe :</label><br />
+          <input
+            type="password"
+            {...register('password', { required: 'Mot de passe requis' })}
+            style={{ width: '100%', padding: '8px' }}
+          />
+          {errors.password && <div style={{ color: 'red' }}>{errors.password.message}</div>}
+        </div>
+        <button type="submit" style={{ width: '100%', padding: '10px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px' }}>
+          Se connecter
+        </button>
+      </form>
+    </div>
+  );
+};
+
+// Composant avec Formik
+export const ConnexionFormik = () => {
+  return (
+    <div style={{ maxWidth: '350px', margin: '30px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+      <h2>Connexion (Formik)</h2>
+      <Formik
+        initialValues={{ email: '', password: '' }}
+        validate={values => {
+          const errors = {};
+          if (!values.email) {
+            errors.email = 'Email requis';
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+            errors.email = 'Email invalide';
+          }
+          if (!values.password) {
+            errors.password = 'Mot de passe requis';
+          }
+          return errors;
+        }}
+        onSubmit={(values, { setSubmitting, resetForm }) => {
+          alert('Connexion réussie');
+          setSubmitting(false);
+          resetForm();
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <div style={{ marginBottom: '10px' }}>
+              <label>Email :</label><br />
+              <Field type="email" name="email" style={{ width: '100%', padding: '8px' }} />
+              <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <label>Mot de passe :</label><br />
+              <Field type="password" name="password" style={{ width: '100%', padding: '8px' }} />
+              <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
+            </div>
+            <button type="submit" disabled={isSubmitting} style={{ width: '100%', padding: '10px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px' }}>
+              Se connecter
+            </button>
+          </Form>
+        )}
+      </Formik>
+    </div>
+  );
+};
+
+// Pour utiliser :
+// import { ConnexionHookForm, ConnexionFormik } from './Connexion';
+// <ConnexionHookForm /> ou <ConnexionFormik />
